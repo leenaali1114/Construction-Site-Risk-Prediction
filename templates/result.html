@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Assessment Results - Construction Risk Assessment</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">Construction Risk Assessment</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/assessment">Risk Assessment</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/map">Risk Map</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="alert alert-info">
+            <h4>Risk Assessment Results for {{ result.location_name }}</h4>
+            {% if result.latitude and result.longitude %}
+            <p>Coordinates: {{ result.latitude }}, {{ result.longitude }}</p>
+            {% endif %}
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Risk Score</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="risk-score-circle 
+                            {% if result.risk_category == 'Low' %}bg-success{% endif %}
+                            {% if result.risk_category == 'Medium' %}bg-warning{% endif %}
+                            {% if result.risk_category == 'High' %}bg-danger{% endif %}
+                            {% if result.risk_category == 'Very High' %}bg-dark{% endif %}
+                        ">
+                            <span>{{ "%.2f"|format(result.risk_score) }}</span>
+                        </div>
+                        <h4 class="mt-3">{{ result.risk_category }} Risk</h4>
+                        <p class="text-muted">Risk scores range from 0 (lowest) to 2 (highest)</p>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Risk Breakdown</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="riskBreakdownChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Risk Factors Analysis</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6>Elevation</h6>
+                        <p>{{ result.explanations.elevation }}</p>
+                        
+                        <h6>Temperature</h6>
+                        <p>{{ result.explanations.temperature }}</p>
+                        
+                        <h6>Rainfall</h6>
+                        <p>{{ result.explanations.rainfall }}</p>
+                        
+                        <h6>Humidity</h6>
+                        <p>{{ result.explanations.humidity }}</p>
+                        
+                        <h6>Natural Disaster Risks</h6>
+                        <p>{{ result.explanations.natural_disasters }}</p>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Recommended Mitigation Strategies</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if result.advanced_recommendations %}
+                            <ul class="nav nav-tabs" id="recommendationTabs" role="tablist">
+                                {% for category, recommendations in result.advanced_recommendations.items() %}
+                                <li class="nav-item">
+                                    <a class="nav-link {% if loop.first %}active{% endif %}" 
+                                       id="{{ category|replace(' ', '-')|lower }}-tab" 
+                                       data-toggle="tab" 
+                                       href="#{{ category|replace(' ', '-')|lower }}" 
+                                       role="tab" 
+                                       aria-controls="{{ category|replace(' ', '-')|lower }}" 
+                                       aria-selected="{% if loop.first %}true{% else %}false{% endif %}">
+                                        {{ category }}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            <div class="tab-content mt-3" id="recommendationTabContent">
+                                {% for category, recommendations in result.advanced_recommendations.items() %}
+                                <div class="tab-pane fade {% if loop.first %}show active{% endif %}" 
+                                     id="{{ category|replace(' ', '-')|lower }}" 
+                                     role="tabpanel" 
+                                     aria-labelledby="{{ category|replace(' ', '-')|lower }}-tab">
+                                    <ul class="list-group">
+                                        {% for recommendation in recommendations %}
+                                        <li class="list-group-item">{{ recommendation }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="text-right mt-3">
+                                <small class="text-muted">Recommendations powered by Groq AI</small>
+                            </div>
+                        {% else %}
+                            <ul class="list-group">
+                                {% for strategy in result.strategies %}
+                                <li class="list-group-item">{{ strategy }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Similar Locations</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Location</th>
+                                        <th>Risk Score</th>
+                                        <th>Similarity</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for location in result.similar_locations %}
+                                    <tr>
+                                        <td>{{ location.Location }}</td>
+                                        <td>{{ "%.2f"|format(location['Risk Score']) }}</td>
+                                        <td>{{ "%.2f"|format(100 - location.distance * 100) }}%</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Feature Importance</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="featureImportanceChart"></canvas>
+                        <p class="text-muted mt-3">These features have the most significant impact on the risk assessment.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Location Map</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="resultMap" style="height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4 mb-5">
+            <a href="/assessment" class="btn btn-primary">Assess Another Location</a>
+            <a href="/map" class="btn btn-outline-primary ml-2">View Risk Map</a>
+        </div>
+    </div>
+
+    <footer class="footer mt-5 py-3 bg-light">
+        <div class="container text-center">
+            <span class="text-muted">© 2023 Construction Risk Assessment | AI-Powered Risk Management</span>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    
+    <script>
+        // Risk Breakdown Chart
+        var riskBreakdownCtx = document.getElementById('riskBreakdownChart').getContext('2d');
+        var riskBreakdownChart = new Chart(riskBreakdownCtx, {
+            type: 'radar',
+            data: {
+                labels: ['Environmental', 'Climate', 'Geographical', 'Lightning'],
+                datasets: [{
+                    label: 'Risk Factors (%)',
+                    data: [
+                        {{ result.risk_breakdown.Environmental }},
+                        {{ result.risk_breakdown.Climate }},
+                        {{ result.risk_breakdown.Geographical }},
+                        {{ result.risk_breakdown.Lightning }}
+                    ],
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    r: {
+                        angleLines: {
+                            display: true
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 100
+                    }
+                }
+            }
+        });
+        
+        // Feature Importance Chart
+        var featureImportanceCtx = document.getElementById('featureImportanceChart').getContext('2d');
+        var featureImportanceChart = new Chart(featureImportanceCtx, {
+            type: 'bar',
+            data: {
+                labels: [
+                    {% for feature, importance in result.feature_importance.items() %}
+                    "{{ feature }}",
+                    {% endfor %}
+                ],
+                datasets: [{
+                    label: 'Feature Importance',
+                    data: [
+                        {% for feature, importance in result.feature_importance.items() %}
+                        {{ importance }},
+                        {% endfor %}
+                    ],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(153, 102, 255, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        
+        // Initialize map
+        {% if result.latitude and result.longitude %}
+        var resultMap = L.map('resultMap').setView([{{ result.latitude }}, {{ result.longitude }}], 13);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(resultMap);
+        
+        // Add marker for the assessed location
+        var riskIcon = L.divIcon({
+            className: 'risk-marker',
+            html: '<div class="risk-marker-inner {{ result.risk_category.lower() }}">{{ "%.1f"|format(result.risk_score) }}</div>',
+            iconSize: [40, 40],
+            iconAnchor: [20, 20]
+        });
+        
+        L.marker([{{ result.latitude }}, {{ result.longitude }}], {icon: riskIcon}).addTo(resultMap)
+            .bindPopup("<b>{{ result.location_name }}</b><br>Risk Score: {{ result.risk_score }}<br>Category: {{ result.risk_category }}");
+        
+        // Add markers for similar locations
+        {% for location in result.similar_locations %}
+        {% if location.Latitude and location.Longitude %}
+        var similarIcon = L.divIcon({
+            className: 'similar-marker',
+            html: '<div class="similar-marker-inner">{{ "%.1f"|format(location['Risk Score']) }}</div>',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+        
+        L.marker([{{ location.Latitude }}, {{ location.Longitude }}], {icon: similarIcon}).addTo(resultMap)
+            .bindPopup("<b>{{ location.Location }}</b><br>Risk Score: {{ location['Risk Score'] }}<br>Similarity: {{ "%.2f"|format(100 - location.distance * 100) }}%");
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+    </script>
+</body>
+</html> 

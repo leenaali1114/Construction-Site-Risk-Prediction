@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Construction Risk Assessment</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">Construction Risk Assessment</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/assessment">Risk Assessment</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/map">Risk Map</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="jumbotron">
+        <div class="container">
+            <h1 class="display-4">AI-Based Risk Assessment for Construction Projects</h1>
+            <p class="lead">Predict and mitigate risks for your construction projects using advanced machine learning algorithms.</p>
+            <hr class="my-4">
+            <p>Our system analyzes environmental, geographical, and climate factors to provide accurate risk assessments and mitigation strategies.</p>
+            <a class="btn btn-primary btn-lg" href="/assessment" role="button">Start Assessment</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Risk Prediction</h5>
+                        <p class="card-text">Our AI model analyzes multiple risk factors to predict the overall risk score for your construction site.</p>
+                        <a href="/assessment" class="btn btn-outline-primary">Try it now</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Risk Visualization</h5>
+                        <p class="card-text">View risk levels across different locations on an interactive map to make informed decisions.</p>
+                        <a href="/map" class="btn btn-outline-primary">View Map</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Mitigation Strategies</h5>
+                        <p class="card-text">Get tailored recommendations to mitigate identified risks for your construction project.</p>
+                        <a href="/assessment" class="btn btn-outline-primary">Get Recommendations</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Dataset Statistics</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Total Locations Analyzed:</strong> {{ stats.total_locations }}</p>
+                        <p><strong>Average Risk Score:</strong> {{ "%.2f"|format(stats.avg_risk_score) }}</p>
+                        <p><strong>Maximum Risk Score:</strong> {{ "%.2f"|format(stats.max_risk_score) }}</p>
+                        <p><strong>Minimum Risk Score:</strong> {{ "%.2f"|format(stats.min_risk_score) }}</p>
+                        <p><strong>Average Temperature:</strong> {{ "%.2f"|format(stats.avg_temp) }}°C</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>How It Works</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol>
+                            <li>Enter your construction site details</li>
+                            <li>Our AI model analyzes multiple risk factors</li>
+                            <li>Receive a comprehensive risk assessment</li>
+                            <li>Get tailored mitigation strategies</li>
+                            <li>Compare with similar locations</li>
+                        </ol>
+                        <a href="/about" class="btn btn-outline-primary">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-5 py-3 bg-light">
+        <div class="container text-center">
+            <span class="text-muted">© 2023 Construction Risk Assessment | AI-Powered Risk Management</span>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html> 

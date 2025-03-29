@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Assessment - Construction Risk Assessment</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">Construction Risk Assessment</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/assessment">Risk Assessment</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/map">Risk Map</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2>Construction Site Risk Assessment</h2>
+        <p class="lead">Enter the details of your construction site to get a comprehensive risk assessment.</p>
+        
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Site Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="/predict" method="POST">
+                            <div class="form-group">
+                                <label for="location_name">Location Name</label>
+                                <input type="text" class="form-control" id="location_name" name="location_name" required>
+                                <small class="form-text text-muted">Enter a descriptive name for the construction site location.</small>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="latitude">Latitude</label>
+                                    <input type="number" step="0.000001" class="form-control" id="latitude" name="latitude" placeholder="e.g., 11.0456">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="longitude">Longitude</label>
+                                    <input type="number" step="0.000001" class="form-control" id="longitude" name="longitude" placeholder="e.g., 76.1234">
+                                </div>
+                            </div>
+                            
+                            <div id="map" style="height: 300px; margin-bottom: 20px;"></div>
+                            <p class="text-muted small">Click on the map to set latitude and longitude</p>
+                            
+                            <h5 class="mt-4">Environmental Factors</h5>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="elevation">Elevation (m)</label>
+                                    <input type="number" class="form-control" id="elevation" name="elevation" min="0" max="2000" required>
+                                    <small class="form-text text-muted">The height above sea level in meters. Typical range in Malappuram: 10-500m.</small>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="temperature">Average Temperature (°C)</label>
+                                    <input type="number" class="form-control" id="temperature" name="temperature" min="20" max="40" step="0.1" required>
+                                    <small class="form-text text-muted">Annual average temperature in degrees Celsius. Typical range: 25-32°C.</small>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="rainfall">Annual Rainfall (mm)</label>
+                                    <input type="number" class="form-control" id="rainfall" name="rainfall" min="1000" max="5000" required>
+                                    <small class="form-text text-muted">Total annual rainfall in millimeters. Typical range in Malappuram: 2000-4000mm.</small>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="humidity">Humidity (%)</label>
+                                    <input type="number" class="form-control" id="humidity" name="humidity" min="50" max="100" required>
+                                    <small class="form-text text-muted">Average relative humidity percentage. Typical range: 70-90%.</small>
+                                </div>
+                            </div>
+                            
+                            <h5 class="mt-4">Risk Factors</h5>
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    <label>Flood Risk</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="flood_risk" id="flood_risk_0" value="0" checked>
+                                        <label class="form-check-label" for="flood_risk_0">Low (0) - No history of flooding, elevated area</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="flood_risk" id="flood_risk_1" value="1">
+                                        <label class="form-check-label" for="flood_risk_1">Medium (1) - Occasional flooding during heavy monsoons</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="flood_risk" id="flood_risk_2" value="2">
+                                        <label class="form-check-label" for="flood_risk_2">High (2) - Regular flooding, low-lying area near water bodies</label>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label>Landslide Risk</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="landslide_risk" id="landslide_risk_0" value="0" checked>
+                                        <label class="form-check-label" for="landslide_risk_0">Low (0) - Flat terrain, stable soil</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="landslide_risk" id="landslide_risk_1" value="1">
+                                        <label class="form-check-label" for="landslide_risk_1">Medium (1) - Moderate slope, some soil instability</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="landslide_risk" id="landslide_risk_2" value="2">
+                                        <label class="form-check-label" for="landslide_risk_2">High (2) - Steep slope, history of landslides in area</label>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label>Earthquake Risk</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="earthquake_risk" id="earthquake_risk_0" value="0" checked>
+                                        <label class="form-check-label" for="earthquake_risk_0">Low (0) - No history of seismic activity</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="earthquake_risk" id="earthquake_risk_1" value="1">
+                                        <label class="form-check-label" for="earthquake_risk_1">Medium (1) - Occasional minor seismic activity</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="earthquake_risk" id="earthquake_risk_2" value="2">
+                                        <label class="form-check-label" for="earthquake_risk_2">High (2) - Located near fault line, history of earthquakes</label>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label>Lightning Risk</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="lightning_risk" id="lightning_risk_0" value="0" checked>
+                                        <label class="form-check-label" for="lightning_risk_0">Low (0) - Few thunderstorms, protected location</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="lightning_risk" id="lightning_risk_1" value="1">
+                                        <label class="form-check-label" for="lightning_risk_1">Medium (1) - Moderate thunderstorm activity</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="lightning_risk" id="lightning_risk_2" value="2">
+                                        <label class="form-check-label" for="lightning_risk_2">High (2) - Frequent thunderstorms, exposed high ground</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-lg btn-block mt-4">Assess Risk</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Risk Factors Guide</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6>Elevation</h6>
+                        <p>Higher elevations may pose challenges for construction equipment and materials transportation.</p>
+                        
+                        <h6>Temperature</h6>
+                        <p>Extreme temperatures can affect construction materials, worker productivity, and construction schedules.</p>
+                        
+                        <h6>Rainfall</h6>
+                        <p>High rainfall areas may experience construction delays, water damage, and require special drainage systems.</p>
+                        
+                        <h6>Humidity</h6>
+                        <p>High humidity can affect material curing times, cause mold growth, and impact worker comfort.</p>
+                        
+                        <h6>Flood Risk</h6>
+                        <p>Areas prone to flooding require special foundation designs and drainage systems.</p>
+                        
+                        <h6>Landslide Risk</h6>
+                        <p>Slopes and unstable ground may require retaining walls and special foundation designs.</p>
+                        
+                        <h6>Earthquake Risk</h6>
+                        <p>Seismic activity requires earthquake-resistant design and construction methods.</p>
+                        
+                        <h6>Lightning Risk</h6>
+                        <p>Areas with frequent lightning strikes need lightning protection systems and safety protocols.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-5 py-3 bg-light">
+        <div class="container text-center">
+            <span class="text-muted">© 2023 Construction Risk Assessment | AI-Powered Risk Management</span>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Initialize map
+        var map = L.map('map').setView([11.0456, 76.1234], 10);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        var marker;
+        
+        // Add marker on click
+        map.on('click', function(e) {
+            if (marker) {
+                map.removeLayer(marker);
+            }
+            
+            marker = L.marker(e.latlng).addTo(map);
+            
+            document.getElementById('latitude').value = e.latlng.lat.toFixed(6);
+            document.getElementById('longitude').value = e.latlng.lng.toFixed(6);
+        });
+    </script>
+</body>
+</html> 

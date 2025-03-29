@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Map - Construction Risk Assessment</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">Construction Risk Assessment</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/assessment">Risk Assessment</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/map">Risk Map</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Risk Map</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>This map shows the risk assessment for various construction locations in the Malappuram region.</p>
+                        <p>The color of each marker indicates the risk level:</p>
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Low Risk
+                                <span class="badge badge-success badge-pill">0.0 - 0.3</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Medium Risk
+                                <span class="badge badge-warning badge-pill">0.3 - 0.7</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                High Risk
+                                <span class="badge badge-danger badge-pill">0.7 - 1.0</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Very High Risk
+                                <span class="badge badge-dark badge-pill">1.0+</span>
+                            </li>
+                        </ul>
+                        
+                        <div class="mt-4">
+                            <h6>Filter by Risk Category</h6>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Low" id="lowRiskCheck" checked>
+                                <label class="form-check-label" for="lowRiskCheck">
+                                    Low Risk
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Medium" id="mediumRiskCheck" checked>
+                                <label class="form-check-label" for="mediumRiskCheck">
+                                    Medium Risk
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="High" id="highRiskCheck" checked>
+                                <label class="form-check-label" for="highRiskCheck">
+                                    High Risk
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="Very High" id="veryHighRiskCheck" checked>
+                                <label class="form-check-label" for="veryHighRiskCheck">
+                                    Very High Risk
+                                </label>
+                            </div>
+                            <button id="applyFilters" class="btn btn-primary btn-sm mt-2">Apply Filters</button>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <a href="/assessment" class="btn btn-outline-primary btn-block">Assess New Location</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Risk Statistics</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="riskStatsContainer">
+                            <canvas id="riskDistributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-9">
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div id="riskMap" style="height: 800px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-5 py-3 bg-light">
+        <div class="container text-center">
+            <span class="text-muted">© 2023 Construction Risk Assessment | AI-Powered Risk Management</span>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        // Parse the locations data
+        var locations = {{ locations|safe }};
+        
+        // Initialize map
+        var map = L.map('riskMap').setView([11.0456, 76.1234], 10);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        // Group markers by risk category
+        var markers = {
+            'Low': [],
+            'Medium': [],
+            'High': [],
+            'Very High': []
+        };
+        
+        // Add markers for each location
+        locations.forEach(function(location) {
+            var riskClass = '';
+            var riskCategory = '';
+            
+            if (location.Risk_Score < 0.3) {
+                riskClass = 'low';
+                riskCategory = 'Low';
+            } else if (location.Risk_Score < 0.7) {
+                riskClass = 'medium';
+                riskCategory = 'Medium';
+            } else if (location.Risk_Score < 1.0) {
+                riskClass = 'high';
+                riskCategory = 'High';
+            } else {
+                riskClass = 'very-high';
+                riskCategory = 'Very High';
+            }
+            
+            var riskIcon = L.divIcon({
+                className: 'risk-marker',
+                html: '<div class="risk-marker-inner ' + riskClass + '">' + location.Risk_Score.toFixed(1) + '</div>',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+            
+            var marker = L.marker([location.Latitude, location.Longitude], {icon: riskIcon})
+                .bindPopup("<b>" + location.Location + "</b><br>Risk Score: " + location.Risk_Score.toFixed(2) + "<br>Category: " + riskCategory);
+            
+            markers[riskCategory].push(marker);
+        });
+        
+        // Add all markers to the map initially
+        Object.values(markers).forEach(function(markerGroup) {
+            markerGroup.forEach(function(marker) {
+                marker.addTo(map);
+            });
+        });
+        
+        // Filter markers based on checkboxes
+        document.getElementById('applyFilters').addEventListener('click', function() {
+            // Clear all markers
+            Object.values(markers).forEach(function(markerGroup) {
+                markerGroup.forEach(function(marker) {
+                    map.removeLayer(marker);
+                });
+            });
+            
+            // Add markers based on selected filters
+            if (document.getElementById('lowRiskCheck').checked) {
+                markers['Low'].forEach(function(marker) {
+                    marker.addTo(map);
+                });
+            }
+            
+            if (document.getElementById('mediumRiskCheck').checked) {
+                markers['Medium'].forEach(function(marker) {
+                    marker.addTo(map);
+                });
+            }
+            
+            if (document.getElementById('highRiskCheck').checked) {
+                markers['High'].forEach(function(marker) {
+                    marker.addTo(map);
+                });
+            }
+            
+            if (document.getElementById('veryHighRiskCheck').checked) {
+                markers['Very High'].forEach(function(marker) {
+                    marker.addTo(map);
+                });
+            }
+        });
+        
+        // Create risk distribution chart
+        var riskDistributionCtx = document.getElementById('riskDistributionChart').getContext('2d');
+        var riskDistributionChart = new Chart(riskDistributionCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Low Risk', 'Medium Risk', 'High Risk', 'Very High Risk'],
+                datasets: [{
+                    data: [
+                        markers['Low'].length,
+                        markers['Medium'].length,
+                        markers['High'].length,
+                        markers['Very High'].length
+                    ],
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.7)',
+                        'rgba(255, 193, 7, 0.7)',
+                        'rgba(220, 53, 69, 0.7)',
+                        'rgba(52, 58, 64, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(40, 167, 69, 1)',
+                        'rgba(255, 193, 7, 1)',
+                        'rgba(220, 53, 69, 1)',
+                        'rgba(52, 58, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Risk Distribution'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

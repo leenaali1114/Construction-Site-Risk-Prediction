@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Construction Risk Assessment</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">Construction Risk Assessment</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/assessment">Risk Assessment</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/map">Risk Map</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/about">About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>About the Project</h4>
+                    </div>
+                    <div class="card-body">
+                        <h5>AI-Based Risk Assessment for Construction Projects</h5>
+                        <p>This project uses machine learning algorithms to predict and assess risks for construction projects in the Malappuram region. By analyzing various environmental, geographical, and climate factors, our system provides comprehensive risk assessments and mitigation strategies.</p>
+                        
+                        <h5 class="mt-4">How It Works</h5>
+                        <p>Our risk assessment system follows these steps:</p>
+                        <ol>
+                            <li><strong>Data Collection:</strong> We collect data on various risk factors including elevation, temperature, rainfall, humidity, and natural disaster risks.</li>
+                            <li><strong>Feature Engineering:</strong> We transform and combine these factors to create meaningful features for our model.</li>
+                            <li><strong>Model Training:</strong> We use machine learning algorithms (Random Forest, Gradient Boosting) to train a predictive model on historical data.</li>
+                            <li><strong>Risk Prediction:</strong> The model predicts a risk score for new construction sites based on their characteristics.</li>
+                            <li><strong>Mitigation Strategies:</strong> Based on the identified risks, we provide tailored mitigation strategies.</li>
+                        </ol>
+                        
+                        <h5 class="mt-4">Risk Factors Considered</h5>
+                        <ul>
+                            <li><strong>Environmental Factors:</strong> Elevation, temperature, rainfall, humidity</li>
+                            <li><strong>Natural Disaster Risks:</strong> Flood risk, landslide risk, earthquake risk, lightning risk</li>
+                            <li><strong>Derived Risk Factors:</strong> Environmental risk, temperature risk, elevation risk, rainfall risk, humidity risk</li>
+                        </ul>
+                        
+                        <h5 class="mt-4">Risk Categories</h5>
+                        <ul>
+                            <li><strong>Low Risk (0.0-0.3):</strong> Minimal risk, standard construction practices should be sufficient.</li>
+                            <li><strong>Medium Risk (0.3-0.7):</strong> Moderate risk, requires enhanced supervision and some specialized techniques.</li>
+                            <li><strong>High Risk (0.7-1.0):</strong> Significant risk, requires comprehensive risk management and specialized construction methods.</li>
+                            <li><strong>Very High Risk (1.0+):</strong> Extreme risk, requires detailed geotechnical investigation and expert consultation throughout the project.</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Technical Implementation</h4>
+                    </div>
+                    <div class="card-body">
+                        <h5>Technologies Used</h5>
+                        <ul>
+                            <li><strong>Backend:</strong> Python, Flask</li>
+                            <li><strong>Machine Learning:</strong> Scikit-learn, Pandas, NumPy</li>
+                            <li><strong>Data Visualization:</strong> Matplotlib, Seaborn, Chart.js</li>
+                            <li><strong>Frontend:</strong> HTML, CSS, JavaScript, Bootstrap</li>
+                            <li><strong>Mapping:</strong> Leaflet.js</li>
+                        </ul>
+                        
+                        <h5 class="mt-4">Machine Learning Models</h5>
+                        <p>We evaluated several machine learning models for risk prediction:</p>
+                        <ul>
+                            <li><strong>Linear Regression:</strong> Provides a baseline but lacks the ability to capture complex relationships.</li>
+                            <li><strong>Random Forest:</strong> Our primary model, which provides excellent performance and interpretability.</li>
+                            <li><strong>Gradient Boosting:</strong> Offers high accuracy but is more complex to interpret.</li>
+                        </ul>
+                        
+                        <h5 class="mt-4">Feature Engineering</h5>
+                        <p>We created several derived features to improve model performance:</p>
+                        <ul>
+                            <li><strong>Environmental Risk:</strong> Combination of flood, landslide, and earthquake risks.</li>
+                            <li><strong>Temperature Risk:</strong> Deviation from average temperature.</li>
+                            <li><strong>Elevation Risk:</strong> Risk based on elevation categories.</li>
+                            <li><strong>Rainfall Risk:</strong> Risk based on annual rainfall categories.</li>
+                            <li><strong>Humidity Risk:</strong> Risk based on humidity categories.</li>
+                            <li><strong>Total Natural Risk:</strong> Combination of all natural disaster risks.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Benefits</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li><strong>Improved Planning:</strong> Identify potential risks before construction begins.</li>
+                            <li><strong>Cost Reduction:</strong> Minimize unexpected expenses by preparing for identified risks.</li>
+                            <li><strong>Enhanced Safety:</strong> Implement appropriate safety measures based on risk assessment.</li>
+                            <li><strong>Better Decision Making:</strong> Make informed decisions about construction methods and materials.</li>
+                            <li><strong>Project Success:</strong> Increase the likelihood of project completion on time and within budget.</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Future Enhancements</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li>Integration with real-time weather data for dynamic risk assessment.</li>
+                            <li>Incorporation of soil type and geological data for more accurate predictions.</li>
+                            <li>Development of a mobile application for on-site risk assessment.</li>
+                            <li>Integration with project management tools for comprehensive risk management.</li>
+                            <li>Expansion to include economic and social risk factors.</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Contact</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>For more information about this project or to provide feedback, please contact us at:</p>
+                        <p><strong>Email:</strong> info@constructionrisk.ai</p>
+                        <p><strong>Phone:</strong> +91 1234567890</p>
+                        <a href="/assessment" class="btn btn-primary btn-block mt-3">Try the Risk Assessment</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-5 py-3 bg-light">
+        <div class="container text-center">
+            <span class="text-muted">© 2023 Construction Risk Assessment | AI-Powered Risk Management</span>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html> 
